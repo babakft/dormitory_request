@@ -68,13 +68,32 @@ class MaintenanceRequest(models.Model):
     # Status tracking
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
 
-    # Completion details (filled by services team)
+    # Assignment to expert (NEW FIELDS)
+    assigned_expert = models.ForeignKey(
+        'services.ServiceExpert',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_requests'
+    )
+    assigned_at = models.DateTimeField(null=True, blank=True)
+
+    # Work progress (NEW FIELDS)
+    work_started_at = models.DateTimeField(null=True, blank=True)
+    expert_notes = models.TextField(blank=True)
+    work_in_progress_image = models.ImageField(
+        upload_to='maintenance_progress/',
+        null=True,
+        blank=True
+    )
+
+    # Completion details (existing fields)
     completion_image = models.ImageField(upload_to='maintenance_completed/', null=True, blank=True)
     completion_notes = models.TextField(blank=True)
     completed_by = models.CharField(max_length=100, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
 
-    # Student feedback (after completion)
+    # Student feedback (existing fields)
     student_rating = models.IntegerField(null=True, blank=True, choices=[(i, i) for i in range(1, 6)])
     student_feedback = models.TextField(blank=True)
 

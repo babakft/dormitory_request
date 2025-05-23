@@ -29,19 +29,22 @@ class MaintenanceRequestAdmin(admin.ModelAdmin):
         'student',
         'full_location',
         'status',
+        'assigned_expert',  # NEW FIELD
         'created_at',
         'days_since_created'
     ]
-    list_filter = ['status', 'building_name', 'created_at']
+    list_filter = ['status', 'building_name', 'created_at', 'assigned_expert']  # UPDATED
     search_fields = [
         'title',
         'description',
         'student__student_name',
-        'student__student_number'
+        'student__student_number',
+        'assigned_expert__expert_name'  # NEW FIELD
     ]
-    actions = ['approve_requests', 'mark_in_progress', 'mark_completed']
+    actions = ['approve_requests', 'assign_to_expert', 'mark_in_progress', 'mark_completed']
     readonly_fields = ['created_at', 'updated_at', 'days_since_created']
 
+    # UPDATED fieldsets:
     fieldsets = (
         ('Request Details', {
             'fields': ('student', 'title', 'description', 'issue_image')
@@ -49,8 +52,12 @@ class MaintenanceRequestAdmin(admin.ModelAdmin):
         ('Location', {
             'fields': ('building_name', 'room_number', 'floor_number')
         }),
-        ('Status', {
-            'fields': ('status',)
+        ('Status & Assignment', {  # UPDATED SECTION
+            'fields': ('status', 'assigned_expert', 'assigned_at')
+        }),
+        ('Work Progress', {  # NEW SECTION
+            'fields': ('work_started_at', 'expert_notes', 'work_in_progress_image'),
+            'classes': ('collapse',)
         }),
         ('Completion Details', {
             'fields': ('completion_image', 'completion_notes', 'completed_by', 'completed_at'),
@@ -84,3 +91,15 @@ class MaintenanceRequestAdmin(admin.ModelAdmin):
         self.message_user(request, f'Marked {queryset.count()} requests as completed.')
 
     mark_completed.short_description = "Mark as completed"
+
+    def assign_to_expert(self, request, queryset):
+        updated = queryset.filter(status='approved').update(
+            status='in_progress',
+            assigned_at=timezone.now()
+        )
+        self.message_user(
+            request,
+            f'Marked {updated} requests as in progress. Please assign experts manually.'
+        )
+
+    assign_to_expert.short_description = "Mark as in progress (ready for expert assignment)"

@@ -31,23 +31,6 @@ class ServiceExpert(models.Model):
     def __str__(self):
         return f"{self.expert_name} - {self.get_specialization_display()}"
 
-    @property
-    def assigned_requests(self):
-        """Get all requests assigned to this expert"""
-        # Import here to avoid circular import
-        from student.models import MaintenanceRequest
-        return MaintenanceRequest.objects.filter(assigned_expert=self)
-
-    @property
-    def pending_requests(self):
-        """Get pending requests assigned to this expert"""
-        return self.assigned_requests.filter(status='in_progress')
-
-    @property
-    def completed_requests(self):
-        """Get completed requests by this expert"""
-        return self.assigned_requests.filter(status='completed')
-
     class Meta:
-        verbose_name = 'Service Expert'
-        verbose_name_plural = 'Service Experts'
+        verbose_name = 'Service'
+        verbose_name_plural = 'Services'
