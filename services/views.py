@@ -33,7 +33,7 @@ def expert_login(request):
                 request.session['employee_id'] = expert.employee_id
 
                 messages.success(request, f'Welcome back, {expert.expert_name}!')
-                return redirect('expert_dashboard')
+                return redirect('services:expert_dashboard')
             else:
                 messages.error(request, 'Invalid employee ID or password.')
 
