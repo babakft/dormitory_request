@@ -123,6 +123,7 @@
                                     <thead>
                                         <tr>
                                             <th>Request</th>
+                                            <th>Service Type</th>
                                             <th>Student</th>
                                             <th>Location</th>
                                             <th>Assigned Date</th>
@@ -136,6 +137,9 @@
                                                 <td>
                                                     <strong>{{ request.title }}</strong><br>
                                                     <small class="text-muted">{{ request.description|truncatechars:60 }}</small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-secondary">{{ request.get_service_type_display }}</span>
                                                 </td>
                                                 <td>
                                                     {{ request.student.student_name }}<br>
@@ -206,6 +210,7 @@
                                     <thead>
                                         <tr>
                                             <th>Request</th>
+                                            <th>Service Type</th>
                                             <th>Student</th>
                                             <th>Location</th>
                                             <th>Completed Date</th>
@@ -218,6 +223,9 @@
                                             <tr>
                                                 <td>
                                                     <strong>{{ request.title }}</strong>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-secondary">{{ request.get_service_type_display }}</span>
                                                 </td>
                                                 <td>{{ request.student.student_name }}</td>
                                                 <td>{{ request.full_location }}</td>

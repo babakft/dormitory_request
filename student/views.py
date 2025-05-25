@@ -99,11 +99,12 @@ def maintenance_request(request):
             maintenance_req = form.save(commit=False)
             maintenance_req.student = student
             maintenance_req.status = 'pending'
+            # service_type will be automatically saved from the form
             maintenance_req.save()
 
             messages.success(
                 request,
-                'Maintenance request submitted successfully! It will be reviewed by admin.'
+                f'Maintenance request submitted successfully! A {maintenance_req.get_service_type_display()} expert will be assigned to handle your request.'
             )
             return redirect('student:request_success')
     else:

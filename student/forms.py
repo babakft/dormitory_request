@@ -59,6 +59,7 @@ class MaintenanceRequestForm(forms.ModelForm):
         fields = [
             'title',
             'description',
+            'service_type',  # Added service_type field
             'issue_image',
             'room_number',
             'building_name',
@@ -73,6 +74,10 @@ class MaintenanceRequestForm(forms.ModelForm):
                 'class': 'form-control',
                 'rows': 4,
                 'placeholder': 'Detailed description of what needs to be fixed...'
+            }),
+            'service_type': forms.Select(attrs={
+                'class': 'form-control',
+                'id': 'service_type'
             }),
             'issue_image': forms.FileInput(attrs={
                 'class': 'form-control',

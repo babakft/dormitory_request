@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 from student.models import Student, MaintenanceRequest
 
 
@@ -27,35 +28,35 @@ class MaintenanceRequestAdmin(admin.ModelAdmin):
     list_display = [
         'title',
         'student',
+        'service_type',  # Added service_type to display
         'full_location',
         'status',
-        'assigned_expert',  # NEW FIELD
+        'assigned_expert',
         'created_at',
         'days_since_created'
     ]
-    list_filter = ['status', 'building_name', 'created_at', 'assigned_expert']  # UPDATED
+    list_filter = ['status', 'service_type', 'building_name', 'created_at', 'assigned_expert']  # Added service_type to filters
     search_fields = [
         'title',
         'description',
         'student__student_name',
         'student__student_number',
-        'assigned_expert__expert_name'  # NEW FIELD
+        'assigned_expert__expert_name'
     ]
     actions = ['approve_requests', 'assign_to_expert', 'mark_in_progress', 'mark_completed']
     readonly_fields = ['created_at', 'updated_at', 'days_since_created']
 
-    # UPDATED fieldsets:
     fieldsets = (
         ('Request Details', {
-            'fields': ('student', 'title', 'description', 'issue_image')
+            'fields': ('student', 'title', 'description', 'service_type', 'issue_image')  # Added service_type
         }),
         ('Location', {
             'fields': ('building_name', 'room_number', 'floor_number')
         }),
-        ('Status & Assignment', {  # UPDATED SECTION
+        ('Status & Assignment', {
             'fields': ('status', 'assigned_expert', 'assigned_at')
         }),
-        ('Work Progress', {  # NEW SECTION
+        ('Work Progress', {
             'fields': ('work_started_at', 'expert_notes', 'work_in_progress_image'),
             'classes': ('collapse',)
         }),
@@ -93,13 +94,14 @@ class MaintenanceRequestAdmin(admin.ModelAdmin):
     mark_completed.short_description = "Mark as completed"
 
     def assign_to_expert(self, request, queryset):
+        from django.utils import timezone
         updated = queryset.filter(status='approved').update(
             status='in_progress',
             assigned_at=timezone.now()
         )
         self.message_user(
             request,
-            f'Marked {updated} requests as in progress. Please assign experts manually.'
+            f'Marked {updated} requests as in progress. Please assign experts manually based on service type.'
         )
 
     assign_to_expert.short_description = "Mark as in progress (ready for expert assignment)"

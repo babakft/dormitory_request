@@ -7,158 +7,201 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow">
-                    <div class="card-header bg-primary text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h3 class="mb-0">
-                                <i class="fas fa-tools"></i> Submit Maintenance Request
-                            </h3>
-                            <div class="text-end">
-                                <small>Logged in as: {{ student.student_name }}</small><br>
-                                <a href="{% url 'student:student_logout' %}" class="btn btn-sm btn-outline-light">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
-                                </a>
-                            </div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            <i class="fas fa-tools"></i> Submit Maintenance Request
+                        </h3>
+                        <div class="text-end">
+                            <small>Logged in as: {{ student.student_name }}</small><br>
+                            <a href="{% url 'student:student_logout' %}" class="btn btn-sm btn-outline-light">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <!-- Messages -->
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
+                </div>
+                <div class="card-body">
+                    <!-- Messages -->
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
 
-                        <!-- Student Info Box -->
-                        <div class="alert alert-info">
-                            <h6><i class="fas fa-user"></i> Your Information</h6>
-                            <strong>Name:</strong> {{ student.student_name }}<br>
-                            <strong>Student Number:</strong> {{ student.student_number }}<br>
-                            <strong>Current Location:</strong> {{ student.full_room_address }}
+                    <!-- Student Info Box -->
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-user"></i> Your Information</h6>
+                        <strong>Name:</strong> {{ student.student_name }}<br>
+                        <strong>Student Number:</strong> {{ student.student_number }}<br>
+                        <strong>Current Location:</strong> {{ student.full_room_address }}
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">
+                                    <i class="fas fa-heading"></i> Issue Title *
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                <div class="text-danger">{{ form.title.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">Brief summary of the problem</div>
+                            </div>
                         </div>
 
-                        <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-
-                            <div class="row">
-                                <div class="col-12 mb-3">
-                                    <label for="{{ form.title.id_for_label }}" class="form-label">
-                                        <i class="fas fa-heading"></i> Issue Title *
-                                    </label>
-                                    {{ form.title }}
-                                    {% if form.title.errors %}
-                                        <div class="text-danger">{{ form.title.errors.0 }}</div>
-                                    {% endif %}
-                                    <div class="form-text">Brief summary of the problem</div>
-                                </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-alt"></i> Problem Description *
+                                </label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">Detailed explanation of what needs to be fixed</div>
                             </div>
+                        </div>
 
-                            <div class="row">
-                                <div class="col-12 mb-3">
-                                    <label for="{{ form.description.id_for_label }}" class="form-label">
-                                        <i class="fas fa-file-alt"></i> Problem Description *
-                                    </label>
-                                    {{ form.description }}
-                                    {% if form.description.errors %}
-                                        <div class="text-danger">{{ form.description.errors.0 }}</div>
-                                    {% endif %}
-                                    <div class="form-text">Detailed explanation of what needs to be fixed</div>
-                                </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.service_type.id_for_label }}" class="form-label">
+                                    <i class="fas fa-wrench"></i> Service Type Required *
+                                </label>
+                                {{ form.service_type }}
+                                {% if form.service_type.errors %}
+                                <div class="text-danger">{{ form.service_type.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">Select the type of service needed</div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-12 mb-3">
-                                    <label for="{{ form.issue_image.id_for_label }}" class="form-label">
-                                        <i class="fas fa-camera"></i> Upload Photo of Issue *
-                                    </label>
-                                    {{ form.issue_image }}
-                                    {% if form.issue_image.errors %}
-                                        <div class="text-danger">{{ form.issue_image.errors.0 }}</div>
-                                    {% endif %}
-                                    <div class="form-text">Take a clear photo showing the problem (max 5MB)</div>
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.issue_image.id_for_label }}" class="form-label">
+                                    <i class="fas fa-camera"></i> Upload Photo of Issue *
+                                </label>
+                                {{ form.issue_image }}
+                                {% if form.issue_image.errors %}
+                                <div class="text-danger">{{ form.issue_image.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">Take a clear photo showing the problem (max 5MB)</div>
                             </div>
+                        </div>
 
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h6 class="mb-0"><i class="fas fa-map-marker-alt"></i> Location Details</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-4 mb-3">
-                                            <label for="{{ form.building_name.id_for_label }}" class="form-label">Building</label>
-                                            {{ form.building_name }}
-                                            {% if form.building_name.errors %}
-                                                <div class="text-danger">{{ form.building_name.errors.0 }}</div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label for="{{ form.room_number.id_for_label }}" class="form-label">Room Number</label>
-                                            {{ form.room_number }}
-                                            {% if form.room_number.errors %}
-                                                <div class="text-danger">{{ form.room_number.errors.0 }}</div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label for="{{ form.floor_number.id_for_label }}" class="form-label">Floor</label>
-                                            {{ form.floor_number }}
-                                            {% if form.floor_number.errors %}
-                                                <div class="text-danger">{{ form.floor_number.errors.0 }}</div>
-                                            {% endif %}
-                                        </div>
+                        <!-- Service Type Help -->
+                        <div class="alert alert-secondary mb-3" id="service-help" style="display: none;">
+                            <h6><i class="fas fa-info-circle"></i> Service Type Guide</h6>
+                            <ul class="mb-0">
+                                <li><strong>Electrical:</strong> Power outages, faulty switches, lighting issues, outlet
+                                    problems
+                                </li>
+                                <li><strong>Plumbing:</strong> Leaks, clogged drains, toilet issues, water pressure
+                                    problems
+                                </li>
+                                <li><strong>HVAC/Air Conditioning:</strong> AC not working, heating issues, ventilation
+                                    problems
+                                </li>
+                                <li><strong>Carpentry:</strong> Broken furniture, door/window repairs, cabinet issues
+                                </li>
+                                <li><strong>General Maintenance:</strong> Painting, minor repairs, other maintenance
+                                    tasks
+                                </li>
+                                <li><strong>Cleaning:</strong> Deep cleaning, sanitization, waste management</li>
+                                <li><strong>Security Systems:</strong> Door locks, security cameras, access control
+                                    issues
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-map-marker-alt"></i> Location Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.building_name.id_for_label }}"
+                                               class="form-label">Building</label>
+                                        {{ form.building_name }}
+                                        {% if form.building_name.errors %}
+                                        <div class="text-danger">{{ form.building_name.errors.0 }}</div>
+                                        {% endif %}
                                     </div>
-                                    <div class="alert alert-warning">
-                                        <small>
-                                            <i class="fas fa-info-circle"></i>
-                                            Location is pre-filled with your registered room.
-                                            Change it only if the issue is in a different location.
-                                        </small>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.room_number.id_for_label }}" class="form-label">Room
+                                            Number</label>
+                                        {{ form.room_number }}
+                                        {% if form.room_number.errors %}
+                                        <div class="text-danger">{{ form.room_number.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.floor_number.id_for_label }}"
+                                               class="form-label">Floor</label>
+                                        {{ form.floor_number }}
+                                        {% if form.floor_number.errors %}
+                                        <div class="text-danger">{{ form.floor_number.errors.0 }}</div>
+                                        {% endif %}
                                     </div>
                                 </div>
+                                <div class="alert alert-warning">
+                                    <small>
+                                        <i class="fas fa-info-circle"></i>
+                                        Location is pre-filled with your registered room.
+                                        Change it only if the issue is in a different location.
+                                    </small>
+                                </div>
                             </div>
+                        </div>
 
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-paper-plane"></i> Submit Request
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane"></i> Submit Request
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 
-    <script>
-        // Preview uploaded image
-        document.getElementById('{{ form.issue_image.id_for_label }}').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                // Check file size
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File size must be less than 5MB');
-                    e.target.value = '';
-                    return;
-                }
+<script>
+    // Show/hide service type help
+    document.getElementById('service_type').addEventListener('focus', function() {
+        document.getElementById('service-help').style.display = 'block';
+    });
 
-                // Show file name
-                const fileName = file.name;
-                if (fileName.length > 20) {
-                    e.target.nextElementSibling.textContent = fileName.substring(0, 20) + '...';
-                } else {
-                    e.target.nextElementSibling.textContent = fileName;
-                }
+    // Preview uploaded image
+    document.getElementById('{{ form.issue_image.id_for_label }}').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Check file size
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                e.target.value = '';
+                return;
             }
-        });
-    </script>
+
+            // Show file name
+            const fileName = file.name;
+            if (fileName.length > 20) {
+                e.target.nextElementSibling.textContent = fileName.substring(0, 20) + '...';
+            } else {
+                e.target.nextElementSibling.textContent = fileName;
+            }
+        }
+    });
+</script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 from django.db import models
 import os
 
+
 class Student(models.Model):
     REGISTRATION_STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -50,12 +51,31 @@ class MaintenanceRequest(models.Model):
         ('completed', 'Completed'),
     ]
 
+    # Service type choices matching expert specializations
+    SERVICE_TYPE_CHOICES = [
+        ('electrical', 'Electrical'),
+        ('plumbing', 'Plumbing'),
+        ('hvac', 'HVAC/Air Conditioning'),
+        ('carpentry', 'Carpentry'),
+        ('general', 'General Maintenance'),
+        ('cleaning', 'Cleaning'),
+        ('security', 'Security Systems'),
+    ]
+
     # Student who made the request
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='maintenance_requests')
 
     # Request details
     title = models.CharField(max_length=200)
     description = models.TextField()
+
+    # Service type field
+    service_type = models.CharField(
+        max_length=20,
+        choices=SERVICE_TYPE_CHOICES,
+        default='general',
+        help_text='Type of service required'
+    )
 
     # Image upload
     issue_image = models.ImageField(upload_to='maintenance_requests/', null=True, blank=True)
@@ -68,7 +88,7 @@ class MaintenanceRequest(models.Model):
     # Status tracking
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
 
-    # Assignment to expert (NEW FIELDS)
+    # Assignment to expert
     assigned_expert = models.ForeignKey(
         'services.ServiceExpert',
         on_delete=models.SET_NULL,
