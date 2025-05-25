@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Work - {{ request.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <!-- Header -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-check-circle"></i> Complete Work Assignment
+                            </h4>
+                            <div>
+                                <a href="{% url 'services:expert_dashboard' %}" class="btn btn-outline-light btn-sm">
+                                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6><i class="fas fa-user"></i> Expert Information</h6>
+                                <p><strong>Name:</strong> {{ expert.expert_name }}</p>
+                                <p><strong>Specialization:</strong> {{ expert.get_specialization_display }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6><i class="fas fa-calendar"></i> Timeline</h6>
+                                <p><strong>Assigned:</strong> {{ request.assigned_at|date:"M d, Y H:i" }}</p>
+                                {% if request.work_started_at %}
+                                    <p><strong>Work Started:</strong> {{ request.work_started_at|date:"M d, Y H:i" }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <h6><i class="fas fa-info-circle"></i> Status</h6>
+                                <p><strong>Current Status:</strong> <span class="badge bg-warning text-dark">{{ request.get_status_display }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Request Summary -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Work Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-tools"></i> Original Request</h6>
+                                <p><strong>Title:</strong> {{ request.title }}</p>
+                                <p><strong>Description:</strong> {{ request.description }}</p>
+                                <p><strong>Location:</strong> {{ request.full_location }}</p>
+                                <p><strong>Student:</strong> {{ request.student.student_name }} ({{ request.student.student_number }})</p>
+                            </div>
+                            <div class="col-md-6">
+                                {% if request.expert_notes %}
+                                    <h6><i class="fas fa-sticky-note"></i> Your Previous Notes</h6>
+                                    <div class="alert alert-light border">
+                                        {{ request.expert_notes|linebreaks }}
+                                    </div>
+                                {% endif %}
+
+                                {% if request.work_in_progress_image %}
+                                    <h6><i class="fas fa-camera"></i> Work Progress Photo</h6>
+                                    <div class="text-center">
+                                        <img src="{{ request.work_in_progress_image.url }}"
+                                             class="img-fluid rounded border"
+                                             style="max-height: 200px;"
+                                             alt="Work Progress Photo">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Issue Photo Reference -->
+                {% if request.issue_image %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0"><i class="fas fa-image"></i> Original Issue Photo</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="{{ request.issue_image.url }}"
+                             class="img-fluid rounded border"
+                             style="max-height: 300px;"
+                             alt="Original Issue Photo">
+                        <br>
+                        <a href="{{ request.issue_image.url }}"
+                           target="_blank"
+                           class="btn btn-outline-secondary btn-sm mt-2">
+                            <i class="fas fa-expand"></i> View Full Size
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Completion Form -->
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-check-double"></i> Mark Work as Completed</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Final Step:</strong> Complete this form to mark the work as finished.
+                            The student will be notified and can provide feedback on your work.
+                        </div>
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <div class="mb-4">
+                                <label for="{{ form.completion_image.id_for_label }}" class="form-label">
+                                    <i class="fas fa-camera"></i> {{ form.completion_image.label }}
+                                </label>
+                                {{ form.completion_image }}
+                                {% if form.completion_image.errors %}
+                                    <div class="text-danger">{{ form.completion_image.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.completion_image.help_text }}</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.completion_notes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-alt"></i> {{ form.completion_notes.label }}
+                                </label>
+                                {{ form.completion_notes }}
+                                {% if form.completion_notes.errors %}
+                                    <div class="text-danger">{{ form.completion_notes.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.completion_notes.help_text }}</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.additional_notes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-plus-circle"></i> {{ form.additional_notes.label }}
+                                </label>
+                                {{ form.additional_notes }}
+                                {% if form.additional_notes.errors %}
+                                    <div class="text-danger">{{ form.additional_notes.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.additional_notes.help_text }}</div>
+                            </div>
+
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Important:</strong> Once you mark this work as completed:
+                                <ul class="mb-0 mt-2">
+                                    <li>The request status will change to "Completed"</li>
+                                    <li>The student will be notified</li>
+                                    <li>The student can rate and provide feedback on your work</li>
+                                    <li>This action cannot be undone</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'services:expert_dashboard' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                <a href="{% url 'services:request_detail' request.id %}" class="btn btn-outline-info">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check-circle"></i> Mark as Completed
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+
+    <script>
+        // Preview uploaded completion image
+        document.getElementById('{{ form.completion_image.id_for_label }}').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Check file size
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Show file name
+                const fileName = file.name;
+                const label = this.nextElementSibling || this.parentNode.querySelector('.form-text');
+                if (label) {
+                    label.textContent = `Selected: ${fileName.length > 30 ? fileName.substring(0, 30) + '...' : fileName}`;
+                    label.className = 'form-text text-success';
+                }
+            }
+        });
+
+        // Confirm before submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const confirmed = confirm('Are you sure you want to mark this work as completed? This action cannot be undone.');
+            if (!confirmed) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

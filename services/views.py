@@ -72,7 +72,7 @@ def expert_dashboard(request):
     # Get requests in different states
     pending_requests = MaintenanceRequest.objects.filter(
         assigned_expert=expert,
-        status='in_progress'
+        status='approved'
     ).order_by('-assigned_at')
 
     completed_requests = MaintenanceRequest.objects.filter(

@@ -43,7 +43,7 @@ class MaintenanceRequestAdmin(admin.ModelAdmin):
         'student__student_number',
         'assigned_expert__expert_name'
     ]
-    actions = ['approve_requests', 'assign_to_expert', 'mark_in_progress', 'mark_completed']
+    actions = ['assign_to_expert', 'mark_completed', 'mark_approved']
     readonly_fields = ['created_at', 'updated_at', 'days_since_created']
 
     fieldsets = (
@@ -74,17 +74,6 @@ class MaintenanceRequestAdmin(admin.ModelAdmin):
         }),
     )
 
-    def approve_requests(self, request, queryset):
-        queryset.update(status='approved')
-        self.message_user(request, f'Approved {queryset.count()} maintenance requests.')
-
-    approve_requests.short_description = "Approve selected requests"
-
-    def mark_in_progress(self, request, queryset):
-        queryset.update(status='in_progress')
-        self.message_user(request, f'Marked {queryset.count()} requests as in progress.')
-
-    mark_in_progress.short_description = "Mark as in progress"
 
     def mark_completed(self, request, queryset):
         from django.utils import timezone
@@ -95,13 +84,16 @@ class MaintenanceRequestAdmin(admin.ModelAdmin):
 
     def assign_to_expert(self, request, queryset):
         from django.utils import timezone
-        updated = queryset.filter(status='approved').update(
+        updated = queryset.update(
             status='in_progress',
             assigned_at=timezone.now()
         )
-        self.message_user(
-            request,
-            f'Marked {updated} requests as in progress. Please assign experts manually based on service type.'
-        )
 
     assign_to_expert.short_description = "Mark as in progress (ready for expert assignment)"
+
+    def mark_approved(self, request, queryset):
+        from django.utils import timezone
+        # Filter to only update pending items
+        queryset.update(status='approved',)
+
+    mark_approved.short_description = "Mark pending as approved"
