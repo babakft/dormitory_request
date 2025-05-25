@@ -52,7 +52,7 @@ def expert_logout(request):
         del request.session['employee_id']
 
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('expert_login')
+    return redirect('services:expert_login')
 
 
 def expert_dashboard(request):
@@ -60,14 +60,14 @@ def expert_dashboard(request):
     # Check if expert is logged in
     if 'expert_id' not in request.session:
         messages.error(request, 'Please log in to access the dashboard.')
-        return redirect('expert_login')
+        return redirect('services:expert_login')
 
     # Get current expert
     try:
         expert = ServiceExpert.objects.get(id=request.session['expert_id'])
     except ServiceExpert.DoesNotExist:
         messages.error(request, 'Expert not found. Please log in again.')
-        return redirect('expert_login')
+        return redirect('services:expert_login')
 
     # Get requests in different states
     pending_requests = MaintenanceRequest.objects.filter(
@@ -85,7 +85,7 @@ def expert_dashboard(request):
         'pending_requests': pending_requests,
         'completed_requests': completed_requests,
         'pending_count': pending_requests.count(),
-        'completed_count': expert.completed_requests.count(),
+        'completed_count': expert.assigned_requests.filter(status='completed').count(),
     }
 
     return render(request, 'services/dashboard.html', context)
@@ -96,14 +96,14 @@ def start_work(request, request_id):
     # Check if expert is logged in
     if 'expert_id' not in request.session:
         messages.error(request, 'Please log in to access this page.')
-        return redirect('expert_login')
+        return redirect('services:expert_login')
 
     # Get current expert
     try:
         expert = ServiceExpert.objects.get(id=request.session['expert_id'])
     except ServiceExpert.DoesNotExist:
         messages.error(request, 'Expert not found. Please log in again.')
-        return redirect('expert_login')
+        return redirect('services:expert_login')
 
     maintenance_request = get_object_or_404(
         MaintenanceRequest,
@@ -122,7 +122,7 @@ def start_work(request, request_id):
             maintenance_request.save()
 
             messages.success(request, 'Work started successfully!')
-            return redirect('expert_dashboard')
+            return redirect('services:expert_dashboard')
     else:
         form = WorkProgressForm()
 
@@ -140,14 +140,14 @@ def complete_work(request, request_id):
     # Check if expert is logged in
     if 'expert_id' not in request.session:
         messages.error(request, 'Please log in to access this page.')
-        return redirect('expert_login')
+        return redirect('services:expert_login')
 
     # Get current expert
     try:
         expert = ServiceExpert.objects.get(id=request.session['expert_id'])
     except ServiceExpert.DoesNotExist:
         messages.error(request, 'Expert not found. Please log in again.')
-        return redirect('expert_login')
+        return redirect('services:expert_login')
 
     maintenance_request = get_object_or_404(
         MaintenanceRequest,
@@ -179,7 +179,7 @@ def complete_work(request, request_id):
                 request,
                 'Work completed successfully! Student will be notified to provide feedback.'
             )
-            return redirect('expert_dashboard')
+            return redirect('services:expert_dashboard')
     else:
         form = WorkCompletionForm()
 
@@ -197,14 +197,14 @@ def request_detail(request, request_id):
     # Check if expert is logged in
     if 'expert_id' not in request.session:
         messages.error(request, 'Please log in to access this page.')
-        return redirect('expert_login')
+        return redirect('services:expert_login')
 
     # Get current expert
     try:
         expert = ServiceExpert.objects.get(id=request.session['expert_id'])
     except ServiceExpert.DoesNotExist:
         messages.error(request, 'Expert not found. Please log in again.')
-        return redirect('expert_login')
+        return redirect('services:expert_login')
 
     maintenance_request = get_object_or_404(
         MaintenanceRequest,

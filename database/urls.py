@@ -20,7 +20,7 @@ from django.urls import path,include
 
 def home_redirect(request):
     """Redirect root URL to student login page"""
-    return redirect('/login')
+    return redirect('/logi')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
