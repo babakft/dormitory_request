@@ -69,10 +69,15 @@ def expert_dashboard(request):
         messages.error(request, 'Expert not found. Please log in again.')
         return redirect('services:expert_login')
 
-    # Get requests in different states
+    # Get requests in different states - FIXED THE FILTER
     pending_requests = MaintenanceRequest.objects.filter(
         assigned_expert=expert,
-        status='approved'
+        status='approved'  # Changed from 'approved' to 'in_progress'
+    ).order_by('-assigned_at')
+
+    in_progress_requests = MaintenanceRequest.objects.filter(
+        assigned_expert=expert,
+        status='in_progress'  # Changed from 'approved' to 'in_progress'
     ).order_by('-assigned_at')
 
     completed_requests = MaintenanceRequest.objects.filter(
@@ -82,7 +87,7 @@ def expert_dashboard(request):
 
     context = {
         'expert': expert,
-        'pending_requests': pending_requests,
+        'pending_requests': pending_requests | in_progress_requests,
         'completed_requests': completed_requests,
         'pending_count': pending_requests.count(),
         'completed_count': expert.assigned_requests.filter(status='completed').count(),
@@ -109,7 +114,7 @@ def start_work(request, request_id):
         MaintenanceRequest,
         id=request_id,
         assigned_expert=expert,
-        status='in_progress'
+        status='approved'
     )
 
     if request.method == 'POST':
@@ -117,8 +122,10 @@ def start_work(request, request_id):
         if form.is_valid():
             maintenance_request.work_started_at = timezone.now()
             maintenance_request.expert_notes = form.cleaned_data['expert_notes']
+            maintenance_request.status = 'in_progress'
             if form.cleaned_data['work_in_progress_image']:
                 maintenance_request.work_in_progress_image = form.cleaned_data['work_in_progress_image']
+
             maintenance_request.save()
 
             messages.success(request, 'Work started successfully!')

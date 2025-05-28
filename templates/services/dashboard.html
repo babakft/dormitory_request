@@ -149,13 +149,17 @@
                                                     <i class="fas fa-map-marker-alt"></i> {{ request.full_location }}
                                                 </td>
                                                 <td>
-                                                    {{ request.assigned_at|date:"M d, Y H:i" }}
+                                                    {% if request.assigned_at %}
+                                                        {{ request.assigned_at|date:"M d, Y H:i" }}
+                                                    {% else %}
+                                                        <span class="text-muted">Not assigned yet</span>
+                                                    {% endif %}
                                                 </td>
                                                 <td>
                                                     {% if request.work_started_at %}
                                                         <span class="badge bg-info">Work Started</span>
                                                     {% else %}
-                                                        <span class="badge bg-warning text-dark">Not Started</span>
+                                                        <span class="badge bg-warning text-dark">Ready to Start</span>
                                                     {% endif %}
                                                 </td>
                                                 <td>

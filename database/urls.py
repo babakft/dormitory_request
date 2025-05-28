@@ -17,10 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path,include
+from django.conf.urls.static import static
+import os
 
 def home_redirect(request):
     """Redirect root URL to student login page"""
-    return redirect('/logi')
+    return redirect('/login')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,3 +30,4 @@ urlpatterns = [
     path('expert/', include('services.urls')),
 
 ]
+urlpatterns += static('/media/', document_root=os.path.join(os.path.dirname(os.path.dirname(__file__)), 'media'))
